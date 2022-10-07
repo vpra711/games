@@ -5,6 +5,8 @@ class Game
     Snake nagini;
     Food potato;
 
+    bool pause;
+
     Thread inputThread;
     Thread functionThread;
 
@@ -24,7 +26,7 @@ class Game
 
     public void init()
     {
-        String inst = "w - up \na - left \ns - down \nd - right \nPress any key to start.....";
+        String inst = "welcome to snake game..... \nw - up \na - left \ns - down \nd - right \n♣ - food \npress space to pause\\resume the game \nPress any key to start.....";
         Console.Write(inst);
         Console.ReadKey();
         Console.Clear();
@@ -59,8 +61,7 @@ class Game
         functionThread.Join();
         inputThread.Join();
 
-        gameOver();
-
+        Console.Clear();
     }
 
     void initInput()
@@ -73,7 +74,14 @@ class Game
 
             if(!checkInverseInput(input))
             {
-                nagini.direction = input;
+                if(input == ' ')
+                {
+                    pause = !pause;
+                }
+                else
+                {
+                    nagini.direction = input;
+                }
             }
 
         }while(input != 'e');
@@ -81,19 +89,26 @@ class Game
 
     void initGame()
     {
-        String content;
+        String content = "";
         potato.genFood();
-        map[potato.y, potato.x] = 'f';
-        print(potato.y, potato.x, "f");
+        map[potato.y, potato.x] = '♣';
+        print(potato.y, potato.x, "♣");
 
         while(nagini.direction != 'e')
         {
-            Thread.Sleep(100);
-            nagini.move();
-            nagini.foodProcess(potato);
-            content = $"score       : {nagini.length} \nposition    : y - {nagini.body[0].y}, x - {nagini.body[0].x} \nFood        : {potato.y}, {potato.x} \nkey pressed : ";
-            print(screenHeight + 2, 0, content);
+            if(!pause)
+            {
+                Thread.Sleep(100);
+                nagini.move();
+                nagini.foodProcess(potato);
+                content = $"score       : {nagini.length} \nposition    : y - {nagini.body[0].y}, x - {nagini.body[0].x} \nFood(♣)     : {potato.y}, {potato.x} \nkey pressed : ";
+                print(screenHeight + 2, 0, content);
+            }
         }
+
+        Console.Clear();
+        Console.WriteLine(content);
+        Console.WriteLine("game over / press e to exit");
     }
 
     bool checkInverseInput(char input)
@@ -108,11 +123,5 @@ class Game
         }
 
         return false;
-    }
-
-    void gameOver()
-    {
-        Console.Clear();
-        Console.WriteLine("game over");
     }
 }

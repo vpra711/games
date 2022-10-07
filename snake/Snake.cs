@@ -29,7 +29,7 @@ class Snake
     public void move()
     {
 
-        body.Insert(0, new coordinates(body[0].y, body[0].x));
+        body.Insert(0, new coordinates(body[0].x, body[0].y));
 
         switch(direction)
         {
@@ -51,7 +51,11 @@ class Snake
 
     public void foodProcess(Food potato)
     {
-        if(!potato.ifFood(this))
+        if(potato.ifFood(this))
+        {
+            Game.print(potato.y, potato.x, "♣");
+        }
+        else
         {
             Game.map[body[length].y, body[length].x] = ' ';
             Game.print(body[length].y, body[length].x, " ");
@@ -63,7 +67,7 @@ class Snake
 
     bool checkCollision()
     {
-        if(body[0].x < 1 || body[0].y < 1 || body[0].x >= Game.screenWidth || body[0].y >= Game.screenHeight)
+        if(body[0].x < 1 || body[0].y < 1 || body[0].x >= Game.screenWidth - 1 || body[0].y >= Game.screenHeight - 1)
         {
             return true;
         }

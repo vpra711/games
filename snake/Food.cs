@@ -15,7 +15,7 @@ class Food
 
     public bool ifFood(Snake s)
     {
-        if(Game.map[s.body[0].y, s.body[0].x] == 'f')
+        if(s.body[0].x == x && s.body[0].y == y)
         {
             s.length++;
             genFood();
