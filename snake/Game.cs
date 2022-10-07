@@ -10,10 +10,16 @@ class Game
 
     public Game()
     {
-        this.nagini = new Snake('d', 1);
-        this.potato = new Food();
+        nagini = new Snake('d', 1);
+        potato = new Food();
         inputThread = new Thread(new ThreadStart(initInput));
         functionThread = new Thread(new ThreadStart(initGame));
+    }
+
+    public static void print(int height, int width, String content)
+    {
+        Console.SetCursorPosition(width, height);
+        Console.Write(content);
     }
 
     public void init()
@@ -23,7 +29,7 @@ class Game
         Console.ReadKey();
         Console.Clear();
         Console.CursorVisible = false;
-        Console.WindowHeight = screenHeight + 20;
+        Console.WindowHeight = screenHeight + 10;
         Console.WindowWidth = screenWidth + 5;
         Console.Title = "Snake Game";
 
@@ -75,27 +81,18 @@ class Game
 
     void initGame()
     {
+        String content;
         potato.genFood();
-        Game.map[potato.y, potato.x] = 'f';
-        Console.SetCursorPosition(potato.y, potato.x);
-        Console.Write('f');
+        map[potato.y, potato.x] = 'f';
+        print(potato.y, potato.x, "f");
 
         while(nagini.direction != 'e')
         {
             Thread.Sleep(100);
             nagini.move();
-
-            if(!potato.ifFood(nagini))
-            {
-                Game.map[nagini.body[nagini.length].y, nagini.body[nagini.length].x] = ' ';
-                Console.SetCursorPosition(nagini.body[nagini.length].y, nagini.body[nagini.length].x);
-                Console.Write(' ');
-                nagini.body.RemoveAt(nagini.length);
-            }
-
-            Game.map[nagini.body[0].y, nagini.body[0].x] = 's';
-
-            updateStatus();
+            nagini.foodProcess(potato);
+            content = $"score       : {nagini.length} \nposition    : y - {nagini.body[0].y}, x - {nagini.body[0].x} \nFood        : {potato.y}, {potato.x} \nkey pressed : ";
+            print(screenHeight + 2, 0, content);
         }
     }
 
@@ -111,13 +108,6 @@ class Game
         }
 
         return false;
-    }
-
-    void updateStatus()
-    {
-        Console.SetCursorPosition(0, Game.screenHeight + 2);
-        String s = $"score       : {nagini.length} \nposition    : y - {nagini.body[0].y}, x - {nagini.body[0].x} \nFood        : {potato.y}, {potato.x} \nkey pressed : ";
-        Console.Write(s);
     }
 
     void gameOver()

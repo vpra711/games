@@ -39,18 +39,26 @@ class Snake
             case 'd': body[0].x++; break;
         }
 
-
         if(checkCollision())
         {
             direction = 'e';
         }
 
+        Game.print(body[1].y, body[1].x, "#");
+        Game.print(body[0].y, body[0].x, "@");
 
-        Console.SetCursorPosition(body[1].y, body[1].x);
-        Console.Write('#');
+    }
 
-        Console.SetCursorPosition(body[0].y, body[0].x);
-        Console.Write('@');
+    public void foodProcess(Food potato)
+    {
+        if(!potato.ifFood(this))
+        {
+            Game.map[body[length].y, body[length].x] = ' ';
+            Game.print(body[length].y, body[length].x, " ");
+            body.RemoveAt(length);
+        }
+
+        Game.map[body[0].y, body[0].x] = 's';
     }
 
     bool checkCollision()
