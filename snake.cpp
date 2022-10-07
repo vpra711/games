@@ -3,13 +3,11 @@
 #include <thread>
 #include <Windows.h>
 
-#define setCurPos(x, y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), COORD(x, y))
-
 using position = struct coordinate;
 
-const int groundHeight = 70;
-const int groundWidth = 10;
-char ground[groundHeight][groundWidth];
+const int GROUNDHEIGHT = 70;
+const int GROUNDWIDTH = 10;
+char ground[GROUNDHEIGHT][GROUNDWIDTH];
 
 struct coordinate
 {
@@ -23,8 +21,8 @@ class Food
 
         void generateFood()
         {
-            x = rand() % groundHeight;
-            y = rand() % groundWidth;
+            x = rand() % GROUNDHEIGHT;
+            y = rand() % GROUNDWIDTH;
 
             if(ground[x][y] != ' ')
             {
@@ -38,38 +36,49 @@ class Snake
     public:
         char direction;
         int score, length;
-        position body[groundHeight * groundWidth];
+        position body[GROUNDHEIGHT * GROUNDWIDTH];
 
-        void move(Food &f)
+        void move()
         {
-            setCurPos(body[0].x, body[0].y);
-            std::cout << '*';
+
+            //setCurPos(body[0].x, body[0].y);
+            std::cout << ' ';
 
             switch(direction)
             {
                 case 'w': body[0].x--; break;
                 case 'a': body[0].y--; break;
-                case 's': body[0].y++; break;
-                case 'd': body[0].x++; break;
+                case 's': body[0].x++; break;
+                case 'd': body[0].y++; break;
             }
 
-            setCurPos(body[0].x, body[0].y);
-            std::cout << '{';
+            
+            std::cout << '@' << direction;
+            std::cout << body[0].x << " " << body[0].y;
 
-            if(!this->ifFood(f))
-            {
-                setCurPos(body[length].x, body[length].y);
-                std::cout << ' ';
-            }
         }
 
         bool ifFood(Food &f)
         {
             if(body[0].x == f.x && body[0].y == f.y)
             {
-                f.generateFood();
                 score++;
                 length++;
+                f.generateFood();
+                return true;
+            }
+
+            return false;
+        }
+
+        bool checkInputInverse(char input)
+        {
+            if((input == 'w' && direction == 's') || (input == 's' && direction == 'w'))
+            {
+                return true;
+            }
+            else if((input == 'a' && direction == 'd') || (input == 'd' && direction == 'a'))
+            {
                 return true;
             }
 
@@ -79,7 +88,8 @@ class Snake
 
 void getInput();
 void startGame();
-bool checkOppositeDirection(char input, char direction);
+
+void setCurPos(int, int);
 
 Food f;
 Snake nagini;
@@ -89,11 +99,11 @@ int main()
     int i = 0, j = 0;
     system("clear");
 
-    for(i = 0; i <= groundWidth; i++)
+    for(i = 0; i <= GROUNDWIDTH; i++)
     {
-        for(j = 0; j <= groundHeight; j++)
+        for(j = 0; j <= GROUNDHEIGHT; j++)
         {
-            if(i == 0 || j == 0 || i == groundWidth || j == groundHeight)
+            if(i == 0 || j == 0 || i == GROUNDWIDTH || j == GROUNDHEIGHT)
             {
                 std::cout << '*';
             }
@@ -105,9 +115,13 @@ int main()
         std::cout << '\n';
     }
 
+    
+
     nagini.direction = 'd';
     nagini.length = 1;
     nagini.score = 0;
+    nagini.body[0].x = GROUNDWIDTH / 2;
+    nagini.body[0].y = GROUNDHEIGHT / 2;
 
     std::thread input(getInput);
     std::thread game(startGame);
@@ -126,33 +140,31 @@ void getInput()
     {
         input = getch();
 
-        if(!checkOppositeDirection(input, nagini.direction))
+        if(!nagini.checkInputInverse(input))
+        {
             nagini.direction = input;
+        }
 
     }while(nagini.direction != 'e');
-}
-
-bool checkOppositeDirection(char input, char direction)
-{
-    bool state;
-
-    if((input == 'w' && direction == 's') || (input == 's' && direction == 'w'))
-        state = true;
-    else if((input == 'a' && direction == 'd') || (input == 'd' && direction == 'a'))
-        state = true;
-
-    return state;
 }
 
 void startGame()
 {
-    // do
-    // {
-    //     nagini.move(f);
-    // }while(nagini.direction != 'e');
-
     do
     {
-        std::cout << nagini.direction;
+        system("sleep 0.1");
+        nagini.move();
+        //nagini.ifFood(f);
+
     }while(nagini.direction != 'e');
+}
+
+void setCurPos(int x, int y)
+{
+    COORD coord;
+
+    coord.X = x;
+    coord.Y = y;
+
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
