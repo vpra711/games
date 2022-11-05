@@ -34,6 +34,7 @@ int validFlagCounter;
 
 int main()
 {
+    // alt code
     notReveal += 219;
     notReveal += notReveal;
 
